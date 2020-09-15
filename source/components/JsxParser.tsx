@@ -6,6 +6,7 @@ import { canHaveChildren, canHaveWhitespace } from '../constants/specialTags'
 import { randomHash } from '../helpers/hash'
 import { parseStyle } from '../helpers/parseStyle'
 import { resolvePath } from '../helpers/resolvePath'
+
 import type {
   Expression,
   JSXAttribute,
@@ -30,7 +31,7 @@ type Props = {
   componentsOnly?: boolean,
   disableFragments?: boolean,
   disableKeyGeneration?: boolean,
-  jsx?: string,
+  ast?: Array<any>,
   onError?: (error: Error) => void,
   showWarnings?: boolean,
   renderError?: ({ error: string }) => JSX.Element,
@@ -55,7 +56,7 @@ export default class JsxParser extends Component<Props> {
     componentsOnly: false,
     disableFragments: false,
     disableKeyGeneration: false,
-    jsx: '',
+    ast: [],
     onError: () => { },
     showWarnings: false,
     renderError: undefined,
@@ -65,25 +66,8 @@ export default class JsxParser extends Component<Props> {
 
   ParsedChildren: ParsedTree = null
 
-  parseJSX = (jsx: string): JSX.Element | JSX.Element[] => {
-    const wrappedJsx = `<root>${jsx}</root>`
-    let parsed: Expression[] = []
-    try {
-      // @ts-ignore - AcornJsx doesn't have typescript typings
-      parsed = parser.parse(wrappedJsx)
-      // @ts-ignore - AcornJsx doesn't have typescript typings
-      parsed = parsed.body[0].expression.children || []
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      if (this.props.showWarnings) console.warn(error)
-      if (this.props.onError) this.props.onError(error)
-      if (this.props.renderError) {
-        return this.props.renderError({ error: String(error) })
-      }
-      return []
-    }
-
-    return parsed.map(this.parseExpression).filter(Boolean)
+  parseAST = (ast: Array<any>): JSX.Element | JSX.Element[] => {
+    return ast.map(this.parseExpression).filter(Boolean) || []
   }
 
   parseExpression = (expression: Expression): any => {
@@ -308,16 +292,11 @@ export default class JsxParser extends Component<Props> {
   }
 
   render = (): JSX.Element => {
-    const jsx = (this.props.jsx || '').trim().replace(/<!DOCTYPE([^>]*)>/g, '')
-    this.ParsedChildren = this.parseJSX(jsx)
-    const className = [...new Set(['jsx-parser', ...String(this.props.className).split(' ')])]
-      .filter(Boolean)
-      .join(' ')
-
+    const ast = (this.props.ast || [])
+    this.ParsedChildren = this.parseAST(ast)
+    
     return (
-      this.props.renderInWrapper
-        ? <div className={className}>{this.ParsedChildren}</div>
-        : <>{this.ParsedChildren}</>
+      <>{this.ParsedChildren}</>
     )
   }
 }

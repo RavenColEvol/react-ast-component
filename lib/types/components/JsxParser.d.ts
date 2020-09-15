@@ -13,7 +13,7 @@ declare type Props = {
     componentsOnly?: boolean;
     disableFragments?: boolean;
     disableKeyGeneration?: boolean;
-    jsx?: string;
+    ast?: Array<any>;
     onError?: (error: Error) => void;
     showWarnings?: boolean;
     renderError?: ({ error: string }: {
@@ -36,7 +36,7 @@ export default class JsxParser extends Component<Props> {
         componentsOnly: boolean;
         disableFragments: boolean;
         disableKeyGeneration: boolean;
-        jsx: string;
+        ast: any[];
         onError: () => void;
         showWarnings: boolean;
         renderError: any;
@@ -44,7 +44,7 @@ export default class JsxParser extends Component<Props> {
         renderUnrecognized: () => any;
     };
     ParsedChildren: ParsedTree;
-    parseJSX: (jsx: string) => JSX.Element | JSX.Element[];
+    parseAST: (ast: Array<any>) => JSX.Element | JSX.Element[];
     parseExpression: (expression: Expression) => any;
     parseMemberExpression: (expression: MemberExpression) => any;
     parseName: (element: JSXIdentifier | JSXMemberExpression) => string;

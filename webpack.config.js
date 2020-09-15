@@ -1,5 +1,6 @@
 const TerserPlugin = require('terser-webpack-plugin')
 const webpack = require('webpack')
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 
 const ENVIRONMENT = process.env.NODE_ENV || 'development'
 const PRODUCTION = ENVIRONMENT === 'production'
@@ -77,7 +78,8 @@ module.exports = Object.entries(TYPES).map(([typeName, libraryTarget]) => ({
           highlightCode: true,
         },
       },
-    }],
+    }, 
+    ],
   },
   output: {
     ...buildTarget.output,
